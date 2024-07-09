@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WEATHER App</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+    
+</head>
+<body>
+    <div class="main-container">
+        <div class="card">
+            <div class="search">
+                <input type="text" placeholder="Enter city" id="">
+                <button>Search</button>
+            </div>
+            <div id="first-sub-container"></div>
+            <div class="second-sub-container">
+                <h1 class="state-country">
+                    <span id="city"></span> , 
+                    <span id="country"></span></h1>
+                    <span id="date"></span>
+            </div>
+
+            <div class="Temperature-info-container">
+                <h2 id="temp"> °C</h2>
+                <span class="temp_min_max">
+                    <p id="max-temp" style="display: inline;">MAX </p> 
+                    | 
+                    <p id="min-temp" style="display: inline;">MIN </p>
+                </span>
+               
+            </div>
+        </div>
+    </div>
+    <script>
+        const weekday = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
+        const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+        function getCurrentTime(){
+            let currentTime=new Date();
+            let Today=weekday[currentTime.getDay()]
+            return Today;
+        }
+        function getDate_Day_Time(){
+            let now=new Date();
+            let m=month[now.getMonth()];
+            let d=now.getDate();
+            let hours=now.getHours();
+            let minutes=now.getMinutes();
+            let period='AM'
+            if(hours >11){
+                 period='PM';
+                 if(hours>12){
+                    hours-=12
+                 }
+            }
+            if(minutes<10){
+                minutes="0"+minutes;
+            }
+            let formattedData=`${d} ${m} | ${hours}:${minutes} ${period}`
+            return formattedData;
+        }
+        const currentDate=document.getElementById('date');
+        function Updateday_date_time(){
+            let formattedalldata=getCurrentTime()+' | '+ getDate_Day_Time()
+            currentDate.innerHTML=formattedalldata;
+        }
+        
+        setInterval(Updateday_date_time,1000)  
+       
+
+        function kelvinToCelsius(kelvin) {
+             return (kelvin - 273.15).toFixed(2);
+        }
+        let API_URL="https://api.openweathermap.org/data/2.5/weather?q="
+        let API_KEY="758d0e897f376047db88db924fb014b1"
+        let city="Delhi"
+
+        async function checkweather(city){
+            const response=await fetch(API_URL+city+`&appid=${API_KEY}`)
+            let data=await response.json();
+            document.getElementById('country').innerHTML=data.sys.country;
+            document.getElementById('city').innerHTML=data.name;
+            document.getElementById('temp').innerHTML=`${(kelvinToCelsius(data.main.temp))} °C`;
+            document.getElementById('min-temp').innerHTML=`Min ${kelvinToCelsius(data.main.temp_min)} °C`;
+            document.getElementById('max-temp').innerHTML=`Max ${kelvinToCelsius(data.main.temp_max)} °C`;
+            let tempstatus=data.weather[0].main;
+            checkTempStatus(tempstatus);
+        }
+
+        function checkTempStatus(tempstatus){
+            let weather=document.getElementById("first-sub-container")
+            console.log(tempstatus);
+            if(tempstatus=="Clear"){
+                weather.innerHTML=`<i  class="fa-regular fa-sun" style=" color:yellow"></i>`
+            }
+            else if(tempstatus=="Mist"){
+                weather.innerHTML=`<i  class="fa-solid fa-smog" style=" color:#474747 "></i>`
+            }
+            else if(tempstatus=="Rain"){
+                weather.innerHTML=`<i class="fa-solid fa-cloud-rain" style=" color:#24A0F9 "></i>`
+            }
+            else if(tempstatus=="Clouds"){
+                weather.innerHTML=`<i class="fa-solid fa-cloud" style=" color:#498FFD "></i>`
+
+            }
+        }
+        
+        let searchbtn=document.querySelector('.search button')
+        let searchinput=document.querySelector('.search input')
+        searchinput.addEventListener('keypress',(e)=>{
+            if(e.key=='Enter'){
+                checkweather(searchinput.value)
+            }
+        })
+        checkweather(city); 
+
+        searchbtn.addEventListener("click",()=>{
+            checkweather(searchinput.value)
+        })
+    </script>
+   
+</body>
+</html>
