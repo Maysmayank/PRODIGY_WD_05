@@ -87,6 +87,7 @@
             document.getElementById('max-temp').innerHTML=`Max ${kelvinToCelsius(data.main.temp_max)} °C`;
             let tempstatus=data.weather[0].main;
             checkTempStatus(tempstatus);
+
         }
 
         function checkTempStatus(tempstatus){
